@@ -2,6 +2,8 @@
 Created on Jul 1, 2014
 
 @author: kahere
+
+Portions of AddressData modified from pyzillow: https://github.com/hanneshapke/pyzillow
 '''
 
 

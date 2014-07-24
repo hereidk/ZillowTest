@@ -7,6 +7,9 @@ Created on Jul 1, 2014
 from root.nested.ZillowZip import ZipData, AddressData
 import pandas
 import numpy as np
+import tkinter
+import tkinter.filedialog as tkFileDialog
+import os
 
 def zips():
     # Get list of zip codes from csv file
@@ -105,14 +108,31 @@ def address(address, test_zipcode):
     
     else:
         return
-    
+
+def selectFile():
+    # Browse to directory of portfolio file
+    root2 = tkinter.Tk()
+    root2.withdraw()
+    currdir = os.getcwd()
+    validfile = False
+    while validfile == False: 
+        tempdir = tkFileDialog.askopenfilename(parent=root2, initialdir=currdir, title='Please select a portfolio .csv file. Cancel produces equal exposures in each state/province.')
+#             print ('You chose %s' % tempdir)
+        if tempdir.endswith('.csv'):
+            portfolio_file = tempdir
+            validfile = True
+        else:
+            print("Error: File type must be .csv.")      
+    return portfolio_file             
 
 if __name__ == '__main__':    
     
 #     zips()
+
+    file_name = selectFile()
     
     column_list = columns=['street_address','city','state','zipcode','latitude','longitude','property_type','tax_assessment','year_built','lot_size','sq_ft','bedrooms','bathrooms','estimated_mkt_value']
-    address_list = np.loadtxt('APRS_test.csv',delimiter=',',skiprows=1,dtype=str)
+    address_list = np.loadtxt(file_name,delimiter=',',skiprows=1,dtype=str)
     address_info = pandas.DataFrame(columns=column_list)
 #     count = 0
     address_info = pandas.DataFrame(columns=column_list)
