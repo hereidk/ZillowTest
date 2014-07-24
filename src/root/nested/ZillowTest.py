@@ -36,15 +36,12 @@ def zips():
     print (home_values)
     
 def address(address, test_zipcode):
-#     address = '39 wooster pl, New Haven, CT'
-#     test_zipcode = '06511'
-    
+    # Call AddressData class methods
     address_data = AddressData(address, test_zipcode)
     results = address_data.get_deep_search_results()
-#     print (results)
-#     print (results.request.address.contents[0], results.request.citystatezip.contents[0])
-    
+
     if results is not None:
+        # Set address attributes. If not available, default value is 0
         try:
             street_address = results.result.address.street.contents[0]
         except AttributeError:
@@ -117,7 +114,8 @@ def selectFile():
     validfile = False
     while validfile == False: 
         tempdir = tkFileDialog.askopenfilename(parent=root2, initialdir=currdir, title='Please select a portfolio .csv file. Cancel produces equal exposures in each state/province.')
-#             print ('You chose %s' % tempdir)
+
+        # Make sure file is correct type
         if tempdir.endswith('.csv'):
             portfolio_file = tempdir
             validfile = True
@@ -129,21 +127,28 @@ if __name__ == '__main__':
     
 #     zips()
 
+    # .csv file should have 4 columns (with headers): Address, City, State, Zip
     file_name = selectFile()
     
+    # Attributes to collect from Zillow
     column_list = columns=['street_address','city','state','zipcode','latitude','longitude','property_type','tax_assessment','year_built','lot_size','sq_ft','bedrooms','bathrooms','estimated_mkt_value']
+    
+    # Load text file
     address_list = np.loadtxt(file_name,delimiter=',',skiprows=1,dtype=str)
-    address_info = pandas.DataFrame(columns=column_list)
-#     count = 0
+    
+    # Check each record to see if Zillow can find it, add results to address_info dataframe
     address_info = pandas.DataFrame(columns=column_list)
     for row in address_list:
         single_address = row[0][2:-1]+' '+row[1][2:-1]+' '+row[2][2:-1]
         zipcode = row[-1][2:-1]
+        
+        # Excel removes leading 0, this adds them back
         if len(str(zipcode)) < 5:
             zipcode = str(zipcode).zfill(5)    
         
         get_address = pandas.DataFrame(address(single_address,zipcode),columns=column_list)
         address_info = address_info.append(get_address)
 
+    # Output address dataframe to .csv file
     address_info.to_csv('address_test.csv',sep=',',index=False)
         

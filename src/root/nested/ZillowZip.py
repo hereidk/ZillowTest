@@ -25,11 +25,11 @@ class ZipData():
         '''
         Point to demographics data in Zillow API, get data by zip code
         '''
-        key = 'X1-ZWz1b5jgur5pu3_aypsc'
+        key = 'X1-ZWz1b5jgur5pu3_aypsc' # Zillow API key
         url = 'http://www.zillow.com/webservice/GetDemographics.htm?zws-id=%s&zip=%s' % (key, zipcode)
         geturl = requests.get(url)
         pageText = geturl.text
-        self.soup = BeautifulSoup(pageText,'xml')        
+        self.soup = BeautifulSoup(pageText,'xml') # Parse text with BeautifulSoup
         
     def returnPrettify(self):
         '''
@@ -69,7 +69,7 @@ class AddressData():
     
     
     def __init__(self, address, zipcode):
-        self.key = 'X1-ZWz1b5jgur5pu3_aypsc'
+        self.key = 'X1-ZWz1b5jgur5pu3_aypsc' # Zillow API key
         self.address = address
         self.zipcode = zipcode
     
@@ -105,7 +105,8 @@ class AddressData():
             print ('HTTP Error')
             sys.exit()
 
-        try:            
+        try: 
+            # Parse text results using BeautifulSoup           
             pageText = request.text
             response = BeautifulSoup(pageText,'xml')
         except:
@@ -113,6 +114,7 @@ class AddressData():
             sys.exit()
 
         if not response.find_all('response'):
+            # Check if address has been found - print any addresses with no matches
             print ("Zillow returned no results: ", params['address'])
             return
 
