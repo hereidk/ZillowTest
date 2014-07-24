@@ -6,8 +6,11 @@ Created on Jul 1, 2014
 
 
 import requests
+from requests.exceptions import (ConnectionError, TooManyRedirects, 
+                                Timeout, HTTPError)
 from bs4 import BeautifulSoup
 import numpy as np
+import sys
 
 
 class ZipData():
@@ -16,12 +19,12 @@ class ZipData():
     '''
 
 
-    def __init__(self, zip):
+    def __init__(self, zipcode):
         '''
         Point to demographics data in Zillow API, get data by zip code
         '''
         key = 'X1-ZWz1b5jgur5pu3_aypsc'
-        url = 'http://www.zillow.com/webservice/GetDemographics.htm?zws-id=%s&zip=%s' % (key, zip)
+        url = 'http://www.zillow.com/webservice/GetDemographics.htm?zws-id=%s&zip=%s' % (key, zipcode)
         geturl = requests.get(url)
         pageText = geturl.text
         self.soup = BeautifulSoup(pageText,'xml')        
@@ -57,4 +60,62 @@ class ZipData():
         return get_values
     
     
+class AddressData():
+    '''
+    Get Zillow data at the address level
+    '''
+    
+    
+    def __init__(self, address, zipcode):
+        self.key = 'X1-ZWz1b5jgur5pu3_aypsc'
+        self.address = address
+        self.zipcode = zipcode
+    
+    
+    def get_deep_search_results(self):
+        """
+        GetDeepSearchResults API
+        """
+
+        url = 'http://www.zillow.com/webservice/GetDeepSearchResults.htm'
+        params = {
+            'address': self.address,
+            'citystatezip': self.zipcode,
+            'zws-id': self.key 
+            }
+        return self.get_data(url, params)
+    
+    def get_data(self, url, params):
+        """
+        """
+
+        try:
+            request = requests.get(
+                url = url,
+                params = params)
+        except (ConnectionError, TooManyRedirects, Timeout):
+            print('Connection Error')
+            sys.exit()
+
+        try:
+            request.raise_for_status()
+        except HTTPError:
+            print ('HTTP Error')
+            sys.exit()
+
+        try:            
+            pageText = request.text
+            response = BeautifulSoup(pageText,'xml')
+        except:
+            print ("Zillow response is not a valid XML")
+            sys.exit()
+
+        if not response.find_all('response'):
+            print ("Zillow returned no results: ", params['address'])
+            return
+
+        if len(response.find_all('message/code')) is not 0:
+            print ('Error message: ', response.find_all('message/code')[0].text) 
+        else:
+            return response
     

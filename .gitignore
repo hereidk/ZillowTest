@@ -34,3 +34,6 @@ Icon
 # Files that might appear on external disk
 .Spotlight-V100
 .Trashes
+
+src/root/nested/APRS_test.csv
+src/root/nested/address_test.csv
