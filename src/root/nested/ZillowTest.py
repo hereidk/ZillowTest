@@ -39,68 +39,54 @@ def address(address, test_zipcode):
     # Call AddressData class methods
     address_data = AddressData(address, test_zipcode)
     results = address_data.get_deep_search_results()
-
+    
+    # Select desired property attributes from Zillow
+    attributes = ['result.address.street.contents',
+                  'result.address.city.contents',
+                  'result.address.state.contents',
+                  'result.address.zipcode.contents',
+                  'result.latitude.contents',
+                  'result.longitude.contents',
+                  'result.useCode.contents',
+                  'result.taxAssessment.contents',
+                  'result.yearBuilt.contents',
+                  'result.lotSizeSqFt.contents',
+                  'result.finishedSqFt.contents',
+                  'result.bedrooms.contents',
+                  'result.bathrooms.contents',
+                  'result.zestimate.amount.contents']
+    
+    def splitAttr(attrstring):
+        # Split attribute list, iteratively navigate XML tree
+        attrs = attrstring.split('.')
+        for i in range(len(attrs)):
+            if i == 0:
+                lvl_1 = getattr(results, attrs[i])
+            else:
+                lvl_2 = getattr(lvl_1, attrs[i]) 
+                lvl_1 = lvl_2
+                if i == len(attrs) - 1:
+                    lvl_1 = lvl_1[0]
+        return lvl_1
+        
+    
     if results is not None:
-        # Set address attributes. If not available, default value is 0
-        try:
-            street_address = results.result.address.street.contents[0]
-        except AttributeError:
-            street_address = 0
-        try:
-            city = results.result.address.city.contents[0]
-        except AttributeError:
-            city = 0
-        try:
-            state = results.result.address.state.contents[0]
-        except AttributeError:
-            state = 0
-        try:
-            zipcode = results.result.address.zipcode.contents[0]
-        except AttributeError:
-            zipcode = 0
-        try:
-            latitude = results.result.latitude.contents[0]
-        except AttributeError:
-            latitude = 0
-        try:
-            longitude = results.result.longitude.contents[0]
-        except AttributeError:
-            longitude = 0
-        try:
-            property_type = results.result.useCode.contents[0]
-        except AttributeError:
-            property_type = 0
-        try:
-            tax_assessment = results.result.taxAssessment.contents[0]
-        except AttributeError:
-            tax_assessment = 0
-        try:
-            year_built = results.result.yearBuilt.contents[0]
-        except AttributeError:
-            year_built = 0
-        try:
-            lot_size = results.result.lotSizeSqFt.contents[0]
-        except AttributeError:
-            lot_size = 0
-        try:
-            sq_ft = results.result.finishedSqFt.contents[0]
-        except AttributeError:
-            sq_ft = 0
-        try:
-            bedrooms = results.result.bedrooms.contents[0]
-        except AttributeError:
-            bedrooms = 0
-        try:
-            bathrooms = results.result.bathrooms.contents[0]
-        except AttributeError:
-            bathrooms = 0
-        try:
-            estimated_mkt_value = results.result.zestimate.amount.contents[0]
-        except (AttributeError, IndexError):
-            estimated_mkt_value = 0
+        dataset = [0] * len(attributes)
+        count = -1
+        
+        # Find results for all attributes, add to dataset list
+        for item in attributes:
+            count += 1
+            try:
+                dataset[count] = splitAttr(item)
+            except (AttributeError, IndexError):
+                continue
             
-        dataset = np.array([street_address,city,state,zipcode,latitude,longitude,property_type,tax_assessment,year_built,lot_size,sq_ft,bedrooms,bathrooms,estimated_mkt_value])
-        dataset = dataset.reshape((1,np.shape(dataset)[0]))    
+            
+        # Convert dataset to array, reshape output
+        dataset = np.array(dataset)
+        dataset = dataset.reshape((1,np.shape(dataset)[0]))
+        
         return dataset
     
     else:
