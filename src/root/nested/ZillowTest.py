@@ -10,6 +10,7 @@ import numpy as np
 import tkinter
 import tkinter.filedialog as tkFileDialog
 import os
+import sys
 
 def zips():
     # Get list of zip codes from csv file
@@ -67,8 +68,7 @@ def address(address, test_zipcode):
                 lvl_1 = lvl_2
                 if i == len(attrs) - 1:
                     lvl_1 = lvl_1[0]
-        return lvl_1
-        
+        return lvl_1        
     
     if results is not None:
         dataset = [0] * len(attributes)
@@ -80,8 +80,7 @@ def address(address, test_zipcode):
             try:
                 dataset[count] = splitAttr(item)
             except (AttributeError, IndexError):
-                continue
-            
+                continue            
             
         # Convert dataset to array, reshape output
         dataset = np.array(dataset)
@@ -99,12 +98,15 @@ def selectFile():
     currdir = os.getcwd()
     validfile = False
     while validfile == False: 
-        tempdir = tkFileDialog.askopenfilename(parent=root2, initialdir=currdir, title='Please select a portfolio .csv file. Cancel produces equal exposures in each state/province.')
+        tempdir = tkFileDialog.askopenfilename(parent=root2, initialdir=currdir, title='Please select an address .csv file.')
 
         # Make sure file is correct type
         if tempdir.endswith('.csv'):
             portfolio_file = tempdir
             validfile = True
+        elif len(tempdir) == 0:
+            validfile = True
+            sys.exit()
         else:
             print("Error: File type must be .csv.")      
     return portfolio_file             
@@ -113,14 +115,23 @@ if __name__ == '__main__':
     
 #     zips()
 
-    # .csv file should have 4 columns (with headers): Address, City, State, Zip
-    file_name = selectFile()
+    validfile = False
+    while validfile == False:
+        file_name = selectFile()
+        # Load text file
+        address_list = np.loadtxt(file_name,delimiter=',',skiprows=1,dtype=str)
+        if not address_list.shape[1] == 4:
+            print ('Text file should have 4 columns: Street address, city, state, postal code. Please try again.')
+        elif len(file_name) == 0:
+            validfile = True
+            sys.exit()
+        else:
+            validfile = True 
     
     # Attributes to collect from Zillow
     column_list = columns=['street_address','city','state','zipcode','latitude','longitude','property_type','tax_assessment','year_built','lot_size','sq_ft','bedrooms','bathrooms','estimated_mkt_value']
     
-    # Load text file
-    address_list = np.loadtxt(file_name,delimiter=',',skiprows=1,dtype=str)
+    
     
     # Check each record to see if Zillow can find it, add results to address_info dataframe
     address_info = pandas.DataFrame(columns=column_list)
