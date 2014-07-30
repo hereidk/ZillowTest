@@ -109,12 +109,9 @@ def selectFile():
             sys.exit()
         else:
             print("Error: File type must be .csv.")      
-    return portfolio_file             
+    return portfolio_file         
 
-if __name__ == '__main__':    
-    
-#     zips()
-
+def runAddress():    
     validfile = False
     while validfile == False:
         file_name = selectFile()
@@ -148,4 +145,10 @@ if __name__ == '__main__':
 
     # Output address dataframe to .csv file
     address_info.to_csv('address_test.csv',sep=',',index=False)
+
+if __name__ == '__main__':    
+    
+#     zips()
+
+    runAddress()
         
