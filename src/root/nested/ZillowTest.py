@@ -103,32 +103,36 @@ def selectFile():
         # Make sure file is correct type
         if tempdir.endswith('.csv'):
             portfolio_file = tempdir
-            validfile = True
+            address_list = np.loadtxt(portfolio_file,delimiter=',',skiprows=1,dtype=str)
+            if not address_list.shape[1] == 4:
+                print ('Text file should have 4 columns: Street address, city, state, postal code. Please try again.')
+            else:
+                validfile = True 
         elif len(tempdir) == 0:
             validfile = True
             sys.exit()
         else:
             print("Error: File type must be .csv.")      
-    return portfolio_file         
+    return address_list         
 
 def runAddress():    
-    validfile = False
-    while validfile == False:
-        file_name = selectFile()
+#     validfile = False
+#     while validfile == False:
+#         file_name = selectFile()
         # Load text file
-        address_list = np.loadtxt(file_name,delimiter=',',skiprows=1,dtype=str)
-        if not address_list.shape[1] == 4:
-            print ('Text file should have 4 columns: Street address, city, state, postal code. Please try again.')
-        elif len(file_name) == 0:
-            validfile = True
-            sys.exit()
-        else:
-            validfile = True 
+#         address_list = np.loadtxt(file_name,delimiter=',',skiprows=1,dtype=str)
+#         if not address_list.shape[1] == 4:
+#             print ('Text file should have 4 columns: Street address, city, state, postal code. Please try again.')
+#         elif len(file_name) == 0:
+#             validfile = True
+#             sys.exit()
+#         else:
+#             validfile = True 
     
     # Attributes to collect from Zillow
     column_list = columns=['street_address','city','state','zipcode','latitude','longitude','property_type','tax_assessment','year_built','lot_size','sq_ft','bedrooms','bathrooms','estimated_mkt_value']
     
-    
+    address_list = selectFile()
     
     # Check each record to see if Zillow can find it, add results to address_info dataframe
     address_info = pandas.DataFrame(columns=column_list)
