@@ -4,13 +4,8 @@ Created on Jul 1, 2014
 @author: kahere
 '''
 
-from root.nested.ZillowZip import ZipData, AddressData, AddressList
+from root.nested.ZillowZip import ZipData, AddressList
 import pandas
-import numpy as np
-import tkinter
-import tkinter.filedialog as tkFileDialog
-import os
-import sys
 
 def zips():
     # Get list of zip codes from csv file

@@ -68,7 +68,7 @@ class ZipData():
     
 class AddressData():
     '''
-    Get Zillow data at the address level
+    Get Zillow data at the individual address level
     '''
     
     
@@ -128,6 +128,9 @@ class AddressData():
             return response
     
 class AddressList():
+    '''
+    Process and compile list of address data
+    '''
     def __init__(self):
         pass
     
