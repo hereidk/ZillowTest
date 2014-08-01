@@ -4,7 +4,7 @@ Created on Jul 1, 2014
 @author: kahere
 '''
 
-from root.nested.ZillowZip import ZipData, AddressList
+from ZillowZip import ZipData, AddressList  # @UnresolvedImport
 import pandas
 
 def zips():
